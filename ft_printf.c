@@ -5,22 +5,7 @@
 
 int	ft_fstrlen(const char *str)
 {
-	/*int	i;
-	int	formating;
-
-	formating = 0;
-	i = 0;
-	while (str[i] != '\0')
-	{
-		if(str[i] == '%')
-		{
-			while(!formating)
-			{
-				
-			}	
-		}
-		i++;
-	}*/
+	//Is it possible to measure the fullString before formatting???
 	return (0);
 }
 
@@ -30,32 +15,83 @@ int	computing_flags(const char str)
 {
 	if (str == 'c' || str == 's' || str == 'p' || str == 'd' || str == 'i' 
 		|| str == 'u' || str == 'x' || str == 'X' || str == 37)
-		return (1);
+		return (0);
+	return (1);
+}
+
+int	format_text(const char *arg)
+{
+	write(1, arg, strlen(arg));
+	return (strlen(arg));
+}
+
+int	format_char(int c)
+{
+	char	ch = (char) c;
+	write (1, &ch, 1);
+	return (1);
+}
+
+int	ft_format(const char **str, va_list args)
+{
+	int	length;
+
+	length = 0;
+	(*str)++;//Skip %
+	//if (**str == '\0') return ; null temination protection...
+	while (computing_flags(**str))//Compute flags before reaching format_char(c,s,d...)
+	{
+		if ()//Instead of pre-writting flags,
+		     //Pass the string to "format" functions and 
+		     //apply and make the neccesary "write calls" from there
+		(*str)++;
+	}
+	if (**str == 's')
+		length += format_text(va_arg(args, const char *));//pass"*format" toApply flags
+	else if (**str == 'c' || **str == 37)
+		length += format_char(va_arg(args, int));
+	else if (**str == 'd' || **str == 'i')
+	{
+	}
+	(*str)++;//Skip formatted_char(c,s,d,p...)
+	return (length);
+}
+
+int	has_format(const char *str)
+{
+	str++;//Skip %
+	while (*str)
+	{
+		if (*str == 'c' || *str == 's' || *str == 'p' || *str == 'd' || *str == 'i' 
+		|| *str == 'u' || *str == 'x' || *str == 'X' || *str == 37)
+			return (1);
+		str++;
+	}
 	return (0);
 }
 
-void	ft_format(const char **str)
+int	calc_format(const char *str)
 {
-	(*str)++;//Skip %
-	while (!computing_flags(**str))//Compute flags before reaching format_char(c,s,d...)
+	int	i;
+
+	i = 0;
+	while (*str)
 	{
-		if (**str == 0) //Flag 0
-		{
-		}
-		(*str)++;
+		if (*str == 37 && has_format(str))
+			i++;
+		str++;
 	}
-	(*str)++;//Skip format_char(c,s,d,p...)
+	return (i);
 }
 
 int	ft_printf(const char *format, ...)
 {
 	int	str_size;
-	int	i;
 	va_list	args;
-	char	*str;
+	int	format_num;
 
 	va_start(args, format);
-	str_size = strlen(format);
+	str_size = 0;
 	//str_size = ft_fstrlen(format);
 	/*str = (char*)malloc((str_size + 1) * sizeof(char));
 	if (!str)
@@ -70,29 +106,30 @@ int	ft_printf(const char *format, ...)
 		i++;
 		format++;
 	}*/
+	format_num = calc_format(format);
 	while (*format)
 	{
-		if (*format == 37)
-			ft_format(&format);
+		if (*format == 37 && format_num--)
+			str_size += ft_format(&format, args);
 		else
 		{
 			write(1, format, 1);
 			format++;
+			str_size ++;
 		}
 	}
-	write(1, "\n", 1);
 	va_end(args);
 	return (str_size);
 }
 
 int	main(void)
 {
-	char	a = 'a';
-	char	str1[] = "Hola\n";
+	char	a = 'Z';
+	char	str1[] = "Hola";
 
-	int printed_chars;
+	int printed_chars; //printf return the amount of char "write calls"
 
-	printed_chars = ft_printf("aa %c aaa % d aaa", a);
-	printf("Return from ft_ -> %d\n", printed_chars);
+	printed_chars = ft_printf("aa %s aaa %c aaa%  \n", str1, a);
+	//printf("Return from ft_ -> %d\n", printed_chars);
 	//printed_chars = printf("hola\n");
 }
