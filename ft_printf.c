@@ -41,15 +41,17 @@ int	ft_format(const char **str, va_list args)
 	//if (**str == '\0') return ; null temination protection...
 	while (computing_flags(**str))//Compute flags before reaching format_char(c,s,d...)
 	{
-		if ()//Instead of pre-writting flags,
+		//if ()//Instead of pre-writting flags,
 		     //Pass the string to "format" functions and 
 		     //apply and make the neccesary "write calls" from there
 		(*str)++;
 	}
 	if (**str == 's')
 		length += format_text(va_arg(args, const char *));//pass"*format" toApply flags
-	else if (**str == 'c' || **str == 37)
+	else if (**str == 'c')
 		length += format_char(va_arg(args, int));
+	else if (**str == '%')
+		length += write(1, "%", 1);
 	else if (**str == 'd' || **str == 'i')
 	{
 	}
@@ -57,19 +59,28 @@ int	ft_format(const char **str, va_list args)
 	return (length);
 }
 
+//Auxiliar for calc_format
 int	has_format(const char *str)
 {
 	str++;//Skip %
-	while (*str)
+	printf("here %c\n", *str);
+	if (*str == '%')
+		return (1);
+	else
 	{
-		if (*str == 'c' || *str == 's' || *str == 'p' || *str == 'd' || *str == 'i' 
-		|| *str == 'u' || *str == 'x' || *str == 'X' || *str == 37)
-			return (1);
-		str++;
+		while (*str)
+		{
+			if (*str == 'c' || *str == 's' || *str == 'p' || *str == 'd' || *str == 'i' 
+			|| *str == 'u' || *str == 'x' || *str == 'X')
+				return (1);
+			else 
+				return (0);
+			str++;
+		}
 	}
 	return (0);
 }
-
+//Compute the correct amount of '%' 
 int	calc_format(const char *str)
 {
 	int	i;
@@ -107,6 +118,7 @@ int	ft_printf(const char *format, ...)
 		format++;
 	}*/
 	format_num = calc_format(format);
+	printf("Have to format: %d\n", format_num);
 	while (*format)
 	{
 		if (*format == 37 && format_num--)
@@ -129,7 +141,7 @@ int	main(void)
 
 	int printed_chars; //printf return the amount of char "write calls"
 
-	printed_chars = ft_printf("aa %s aaa %c aaa%  \n", str1, a);
+	printed_chars = ft_printf("%%aa %s aaa %c aaa%  \n", str1, a);
 	//printf("Return from ft_ -> %d\n", printed_chars);
 	//printed_chars = printf("hola\n");
 }
